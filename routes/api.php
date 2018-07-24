@@ -18,6 +18,33 @@ Route::middleware('auth:api')->get('/usuario', function (Request $request) {
     return $request->user();
 });
 
+Route::post('/login', function (Request $request){
+    $data = $request->all();
+    $response = new stdClass();
+    $response->user = null;
+    $response->token = null;
+    $response->status = null;
+    $response->errors = [];
+    $validacao = Validator::make($data, [
+        'email' => 'required|string|email|max:255',
+        'password' => 'required|string',
+    ]);
+    if($validacao->fails()){
+        $response->errors = $validacao->errors();
+        $response->status = false;
+        return json_encode($response);
+    }
+    if(Auth::attempt(['email' => $data['email'], 'password' => $data['password']])){
+        $user = auth()->user();
+        $response->token = $user->createToken($user->email)->accessToken;
+        $response->user = $user;
+        $response->status = true;
+        return json_encode($response);
+    }
+    $response->status = false;
+    return json_encode($response);
+});
+
 Route::post('/cadastro', function (Request $request){
     $data = $request->all();
     $validacao = Validator::make($data, [
