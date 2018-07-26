@@ -47,19 +47,28 @@ Route::post('/login', function (Request $request){
 
 Route::post('/cadastro', function (Request $request){
     $data = $request->all();
+    $response = new stdClass();
+    $response->user = null;
+    $response->token = null;
+    $response->status = null;
+    $response->errors = [];
     $validacao = Validator::make($data, [
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:6|confirmed',
     ]);
     if($validacao->fails()){
-        return $validacao->errors();
+        $response->errors = $validacao->errors();
+        $response->status = false;
+        return json_encode($response);
     }
     $user = User::create([
         'name' => $data['name'],
         'email' => $data['email'],
         'password' => bcrypt($data['password']),
     ]);
-    $user->token = $user->createToken($user->email)->accessToken;
-    return $user;
+    $response->token = $user->createToken($user->email)->accessToken;
+    $response->user = $user;
+    $response->status = true;
+    return json_encode($response);
 });
