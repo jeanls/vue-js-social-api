@@ -56,6 +56,32 @@ Route::middleware('auth:api')->put('/perfil', function (Request $request) {
         if(!file_exists($dir_pai)){
             mkdir($dir_pai, 0700);
         }
+
+        Validator::extend('base64image', function ($attribute, $value, $parameters, $validator){
+            $explode = explode(',', $value);
+            $allow = ['png', 'jpg', 'svg', 'jpeg'];
+            $format = str_replace(['data:image/', ';', 'base64'], ['', '', ''], $explode[0]);
+            if(!in_array($format, $allow)){
+                return false;
+            }
+            if(!preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $explode[1])){
+                return false;
+            }
+            return true;
+        });
+
+        $validacao = Validator::make($data, ['imagem' => 'base64image'], ['base64image' => 'Imagem Inválida']);
+
+        if($validacao->fails()){
+            return $validacao->errors();
+        }
+
+        if($user->imagem){
+            if(file_exists($user->imagem)){
+                unlink($user->imagem);
+            }
+        }
+
         if(!file_exists($dir_img)){
             mkdir($dir_img, 0700);
         }
