@@ -28,6 +28,7 @@ Route::middleware('auth:api')->put('/perfil', function (Request $request) {
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => 'required|string|min:6|confirmed',
+            'descricao' => 'string'
         ]);
         if($validacao->fails()){
             return $validacao->errors();
@@ -36,13 +37,15 @@ Route::middleware('auth:api')->put('/perfil', function (Request $request) {
     }else{
         $validacao = Validator::make($data, [
             'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)]
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'descricao' => 'string'
         ]);
         if($validacao->fails()){
             return $validacao->errors();
         }
         $user->name = $data['name'];
         $user->email = $data['email'];
+        $user->descricao = $data['descricao'];
     }
 
     if(isset($data['imagem'])){
