@@ -40,3 +40,4 @@ Route::get('/testes', function (){
 //    ]);
     return $conteudo->comentarios;
 });
+Route::middleware('auth:api')->post('/conteudo/adicionar', "ConteudoController@adicionar");

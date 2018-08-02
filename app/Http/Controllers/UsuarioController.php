@@ -140,6 +140,7 @@ class UsuarioController extends Controller{
             $user->imagem = $url_imagem;
         }
         $user->save();
+//        $user->comentarios->paginate(10);
         $user->token = $user->createToken($user->email)->accessToken;
         if($user->imagem){
             $user->imagem = asset($user->imagem);
